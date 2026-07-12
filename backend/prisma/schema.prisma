@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ResourceType {
+  PDF
+  GITHUB_REPO
+  CSV
+  AUDIO
+  MARKDOWN
+}
+
+enum ResourceStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum SourceType {
+  UPLOAD
+  URL
+}
+
+enum ArtifactType {
+  VECTOR
+  GRAPH
+  REPO_ANALYSIS
+  SUMMARY
+}
+
+model Resource {
+  id                       String         @id @default(uuid())
+  name                     String
+  sourceType               SourceType     @map("source_type")
+  sourceUri                String         @map("source_uri")
+  type                     ResourceType
+  status                   ResourceStatus @default(PENDING)
+  // Gates whether an MCP server exposes this resource's artifacts to an LLM — has no effect on
+  // pipeline processing, which runs regardless (see docs/reference/data-model.md).
+  isEnabled                Boolean        @default(true) @map("is_enabled")
+  failureReason            String?        @map("failure_reason")
+  pipelineId               String?        @map("pipeline_id")
+  pipeline                 Pipeline?      @relation(fields: [pipelineId], references: [id], onDelete: SetNull)
+  currentStepIndex         Int?           @map("current_step_index")
+  stepSnapshot             Json?          @map("step_snapshot")
+  attemptCount             Int            @default(0) @map("attempt_count")
+  currentStepDispatchedAt  DateTime?      @map("current_step_dispatched_at")
+  artifacts                Artifact[]
+  createdAt                DateTime       @default(now()) @map("created_at")
+  updatedAt                DateTime       @updatedAt @map("updated_at")
+
+  @@map("resources")
+}
+
+model Pipeline {
+  id          String         @id @default(uuid())
+  name        String
+  triggerType ResourceType   @unique @map("trigger_type")
+  steps       PipelineStep[]
+  resources   Resource[]
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+
+  @@map("pipelines")
+}
+
+model PipelineStep {
+  id             String   @id @default(uuid())
+  pipelineId     String   @map("pipeline_id")
+  pipeline       Pipeline @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+  position       Int
+  pluginId       String   @map("plugin_id")
+  plugin         Plugin   @relation(fields: [pluginId], references: [id])
+  maxAttempts    Int      @default(1) @map("max_attempts")
+  backoffSeconds Int      @default(0) @map("backoff_seconds")
+  timeoutSeconds Int      @default(300) @map("timeout_seconds")
+
+  @@unique([pipelineId, position])
+  @@map("pipeline_steps")
+}
+
+model Plugin {
+  id          String         @id @default(uuid())
+  name        String
+  description String
+  author      String
+  version     String
+  isActive    Boolean        @default(true) @map("is_active")
+  steps       PipelineStep[]
+  artifacts   Artifact[]
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+
+  @@map("plugins")
+}
+
+model Artifact {
+  id                 String       @id @default(uuid())
+  resourceId         String       @map("resource_id")
+  resource           Resource     @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  type               ArtifactType
+  producingPluginId  String       @map("producing_plugin_id")
+  producingPlugin    Plugin       @relation(fields: [producingPluginId], references: [id])
+  externalRef        String       @map("external_ref")
+  createdAt          DateTime     @default(now()) @map("created_at")
+  updatedAt          DateTime     @updatedAt @map("updated_at")
+
+  @@unique([resourceId, type])
+  @@map("artifacts")
+}

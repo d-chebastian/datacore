@@ -1,0 +1,147 @@
+networks:
+  datacore-net:
+    external: true
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    networks: [datacore-net]
+    environment:
+      POSTGRES_USER: datacore
+      POSTGRES_PASSWORD: datacore
+      POSTGRES_DB: datacore
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U datacore']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    restart: unless-stopped
+    networks: [datacore-net]
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', '-q', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    networks: [datacore-net]
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: datacore
+      MINIO_ROOT_PASSWORD: datacore123
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    restart: unless-stopped
+    networks: [datacore-net]
+    ports:
+      - '6333:6333'
+    volumes:
+      - qdrant-data:/qdrant/storage
+
+  core-api:
+    build: ./backend
+    restart: unless-stopped
+    networks: [datacore-net]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://datacore:datacore@postgres:5432/datacore
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: datacore
+      MINIO_SECRET_KEY: datacore123
+      MINIO_BUCKET: datacore-resources
+      QDRANT_URL: http://qdrant:6333
+      PORT: '3000'
+    ports:
+      - '3010:3000'
+
+  plugin-markdown-summarizer:
+    build: ./plugins/markdown-summarizer
+    restart: unless-stopped
+    networks: [datacore-net]
+    depends_on:
+      - rabbitmq
+      - core-api
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: datacore
+      MINIO_SECRET_KEY: datacore123
+      MINIO_BUCKET: datacore-resources
+      CORE_API_URL: http://core-api:3000
+      PLUGIN_ID: markdown-summarizer
+
+  plugin-vector-embedder:
+    build: ./plugins/vector-embedder
+    restart: unless-stopped
+    networks: [datacore-net]
+    depends_on:
+      - rabbitmq
+      - core-api
+      - qdrant
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      QDRANT_URL: http://qdrant:6333
+      CORE_API_URL: http://core-api:3000
+      PLUGIN_ID: vector-embedder
+
+  plugin-github-profile-scanner:
+    build: ./plugins/github-profile-scanner
+    restart: unless-stopped
+    networks: [datacore-net]
+    depends_on:
+      - rabbitmq
+      - core-api
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: datacore
+      MINIO_SECRET_KEY: datacore123
+      MINIO_BUCKET: datacore-resources
+      CORE_API_URL: http://core-api:3000
+      PLUGIN_ID: github-profile-scanner
+      # GITHUB_TOKEN: <optional — raises GitHub's unauthenticated 60/hr rate limit to 5000/hr>
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    networks: [datacore-net]
+    depends_on:
+      - core-api
+    ports:
+      - '5173:5173'
+
+volumes:
+  postgres-data:
+  minio-data:
+  qdrant-data:

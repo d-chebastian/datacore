@@ -1,0 +1,168 @@
+{
+  "app": {
+    "title": "DataCore",
+    "subtitle": "ナレッジウェアハウス",
+    "nav": {
+      "resources": "リソース",
+      "pipelines": "パイプライン",
+      "plugins": "プラグイン"
+    },
+    "management": "{{tab}}管理"
+  },
+  "common": {
+    "cancel": "キャンセル",
+    "save": "保存",
+    "close": "閉じる",
+    "loading": "読み込み中..."
+  },
+  "search": {
+    "placeholder": "リソースを検索...",
+    "noMatch": "「{{query}}」に一致するリソースはありません"
+  },
+  "status": {
+    "completed": "完了",
+    "processing": "処理中",
+    "failed": "失敗",
+    "pending": "保留中"
+  },
+  "resources": {
+    "title": "登録済みリソース",
+    "subtitle": "システムに取り込まれた生ファイル、URL、データベースを管理します。",
+    "importFromCommunity": "コミュニティからインポート",
+    "shareAsBundle": "バンドルとして共有",
+    "addResource": "リソースを追加",
+    "table": {
+      "name": "リソース名",
+      "type": "タイプ",
+      "status": "ステータス",
+      "artifacts": "生成された成果物",
+      "llmAccess": "LLMアクセス",
+      "actions": "操作"
+    },
+    "empty": "リソースがまだありません — 「リソースを追加」をクリックして登録してください。",
+    "addedOn": "{{date}} に追加",
+    "noMatchingPipeline": "一致するパイプラインがまだ設定されていません",
+    "viewResult": "結果を表示",
+    "llmAccessOnTitle": "オン — このリソースの成果物はMCP経由でLLMに公開されています。クリックしてオフにします。",
+    "llmAccessOffTitle": "オフ — MCP経由でLLMから隠されています (パイプライン処理には影響しません)。クリックしてオンにします。",
+    "reprocess": "再処理",
+    "editMetadata": "メタデータを編集",
+    "delete": "リソースを削除",
+    "cannotDeleteProcessing": "処理中は削除できません",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "form": {
+      "title": "リソースを追加",
+      "name": "名前",
+      "type": "タイプ",
+      "sourceUrl": "URL",
+      "sourceFile": "ファイルアップロード",
+      "urlPlaceholder": "https://...",
+      "register": "リソースを登録",
+      "registering": "登録中..."
+    }
+  },
+  "pipelines": {
+    "title": "処理パイプライン",
+    "subtitle": "特定のリソースタイプがどのプラグインを経由するかを定義します。",
+    "create": "パイプラインを作成",
+    "triggersOn": "トリガー条件:",
+    "attemptsTimeout": "{{attempts}}回試行 · タイムアウト{{timeout}}秒",
+    "editTitle": "パイプラインを編集",
+    "createTitle": "パイプラインを作成",
+    "name": "名前",
+    "triggerType": "トリガータイプ",
+    "steps": "ステップ",
+    "addStep": "ステップを追加",
+    "columnsCaption": "列: プラグイン · 最大試行回数 · バックオフ (秒) · タイムアウト (秒)",
+    "maxAttemptsTitle": "最大試行回数",
+    "backoffSecondsTitle": "バックオフ秒数",
+    "timeoutSecondsTitle": "タイムアウト秒数",
+    "save": "パイプラインを保存"
+  },
+  "plugins": {
+    "title": "プラグインレジストリ",
+    "subtitle": "リソースをLLM向け成果物に変換するワーカーノードを管理します。",
+    "browseCommunity": "コミュニティを見る",
+    "listening": "● イベント待機中",
+    "offline": "○ オフライン",
+    "versionByAuthor": "v{{version}} • 作者: {{author}}"
+  },
+  "community": {
+    "panelTitle": "コミュニティプラグイン",
+    "panelSubtitle": "他のDataCore運用者によって共有されたプラグインの公開ディレクトリです — 閲覧し、検証してから自分で使いたいものを導入してください。",
+    "openFullSite": "コミュニティサイト全体を開く ↗",
+    "searchPlaceholder": "コミュニティのプラグインを検索...",
+    "postPlugin": "プラグインを投稿",
+    "empty": "コミュニティプラグインはまだありません — 最初の投稿者になりましょう。",
+    "repo": "リポジトリ",
+    "versionByAuthor": "v{{version}} · 作者: {{author}}",
+    "form": {
+      "namePlaceholder": "プラグイン名",
+      "descriptionPlaceholder": "このプラグインは何をしますか?",
+      "repoUrlPlaceholder": "https://github.com/you/your-plugin",
+      "versionPlaceholder": "バージョン、例: 1.0.0",
+      "dockerImagePlaceholder": "Dockerイメージ (任意)、例: ghcr.io/you/your-plugin:1.0.0",
+      "tagsPlaceholder": "タグ、カンマ区切り (任意)、例: csv, embeddings",
+      "post": "プラグインを投稿",
+      "posting": "投稿中...",
+      "cancel": "キャンセル"
+    }
+  },
+  "communityLogin": {
+    "loginTitle": "コミュニティにログイン",
+    "registerTitle": "コミュニティアカウントを作成",
+    "subtitle": "DataCoreコミュニティアカウントは、独立したコミュニティサイトで使うものと同じです — バンドルを共有するために必要です。インポートにはアカウントは不要です。",
+    "emailPlaceholder": "メールアドレス",
+    "usernamePlaceholder": "ユーザー名",
+    "passwordPlaceholder": "パスワード (8文字以上)",
+    "pleaseWait": "お待ちください...",
+    "login": "ログイン",
+    "createAccount": "アカウントを作成",
+    "needAccount": "アカウントをお持ちでないですか?",
+    "alreadyHaveAccount": "すでにアカウントをお持ちですか? ログイン"
+  },
+  "shareBundle": {
+    "title": "DataCoreバンドルとして共有",
+    "success": "バンドルをコミュニティレジストリに共有しました。",
+    "noPipelines": "パイプラインがまだありません — バンドルを共有する前に作成してください。",
+    "explanation": "共有すると、ローカルのパイプライン一覧全体とそのリソース定義 (名前・タイプ・ソース) がエクスポートされます — 処理済みの成果物の内容はエクスポートされません。インポートした人は自分のパイプラインでソースを再取得・再処理します。",
+    "pipelinesToShare": "共有するパイプライン ({{count}}件)",
+    "repoUrlPlaceholder": "https://github.com/you/that-plugin",
+    "eligibleResources": "完了済み・URLソースのリソース ({{count}}件利用可能)",
+    "noEligibleResources": "対象となるリソースがまだありません — リソースは完了済みで、URLで登録されており (アップロードではなく)、上記いずれかのパイプラインが対応するタイプである必要があります。",
+    "namePlaceholder": "バンドル名",
+    "descriptionPlaceholder": "このバンドルは何のためのものですか?",
+    "tagsPlaceholder": "タグ、カンマ区切り (任意)",
+    "submit": "バンドルを共有",
+    "submitting": "共有中...",
+    "loginAndShare": "ログインして共有"
+  },
+  "importBundle": {
+    "title": "コミュニティからインポート",
+    "searchPlaceholder": "共有バンドルを検索...",
+    "noBundlesFound": "バンドルが見つかりません。",
+    "importedSummary_other": "{{count}}件のリソースをインポートしました{{failedSuffix}}。",
+    "failedSuffix": "、{{count}}件失敗",
+    "checkResourcesView": "リソース画面を確認してください — 一致するパイプラインがあれば自動的に処理が始まります。",
+    "backToSearch": "← 検索に戻る",
+    "alreadyHavePipeline": "以下に対応するローカルパイプラインが既にあります: {{types}} — 一致するリソースはすぐに処理を開始します。",
+    "missingPipeline": "{{type}} 用のパイプラインがまだありません (「{{name}}」)。このタイプのリソースは登録されますが、次のプラグインでパイプラインを作成するまで保留状態になります:",
+    "repoLink": "リポジトリ",
+    "resourcesToImport": "インポートするリソース ({{count}}件)",
+    "import": "{{count}}件のリソースをインポート",
+    "importing": "インポート中..."
+  },
+  "artifactViewer": {
+    "loading": "読み込み中...",
+    "dimensionalVector": "{{count}}次元の埋め込みベクトル",
+    "repoTable": {
+      "repo": "リポジトリ",
+      "language": "言語",
+      "stars": "スター数",
+      "forks": "フォーク数"
+    },
+    "fork": "フォーク",
+    "scannedSummary": "{{username}} の公開リポジトリ {{count}}件 — {{date}} にスキャン"
+  }
+}

@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend-integration-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Start Postgres, RabbitMQ, MinIO, Qdrant
+        run: docker compose -f docker-compose.test.yml up -d
+
+      - name: Wait for services to be healthy
+        run: |
+          for svc in postgres rabbitmq minio; do
+            for i in $(seq 1 30); do
+              status=$(docker inspect --format='{{.State.Health.Status}}' "$(docker compose -f docker-compose.test.yml ps -q $svc)")
+              [ "$status" = "healthy" ] && break
+              sleep 2
+            done
+          done
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Apply Prisma migrations
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql://datacore:datacore@localhost:5533/datacore_test
+        run: npx prisma migrate deploy
+
+      - name: Run integration tests
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql://datacore:datacore@localhost:5533/datacore_test
+          RABBITMQ_URL: amqp://guest:guest@localhost:5673
+          MINIO_ENDPOINT: http://localhost:9100
+          MINIO_ACCESS_KEY: datacore
+          MINIO_SECRET_KEY: datacore123
+          MINIO_BUCKET: datacore-resources
+          QDRANT_URL: http://localhost:6433
+        run: npm run test:integration
+
+      - name: Lint backend
+        working-directory: backend
+        run: npm run lint
+
+      - name: Tear down services
+        if: always()
+        run: docker compose -f docker-compose.test.yml down -v
+
+  frontend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build

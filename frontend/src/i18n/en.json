@@ -1,0 +1,169 @@
+{
+  "app": {
+    "title": "DataCore",
+    "subtitle": "Knowledge Warehouse",
+    "nav": {
+      "resources": "Resources",
+      "pipelines": "Pipelines",
+      "plugins": "Plugins"
+    },
+    "management": "{{tab}} Management"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "close": "Close",
+    "loading": "Loading..."
+  },
+  "search": {
+    "placeholder": "Search resources...",
+    "noMatch": "No resources match \"{{query}}\""
+  },
+  "status": {
+    "completed": "Completed",
+    "processing": "Processing",
+    "failed": "Failed",
+    "pending": "Pending"
+  },
+  "resources": {
+    "title": "Registered Resources",
+    "subtitle": "Manage raw files, URLs, and databases ingested into the system.",
+    "importFromCommunity": "Import from Community",
+    "shareAsBundle": "Share as Bundle",
+    "addResource": "Add Resource",
+    "table": {
+      "name": "Resource Name",
+      "type": "Type",
+      "status": "Status",
+      "artifacts": "Generated Artifacts",
+      "llmAccess": "LLM Access",
+      "actions": "Actions"
+    },
+    "empty": "No resources yet — click \"Add Resource\" to register one.",
+    "addedOn": "Added {{date}}",
+    "noMatchingPipeline": "No matching pipeline configured yet",
+    "viewResult": "View result",
+    "llmAccessOnTitle": "On — this resource's artifacts are exposed to LLMs via MCP. Click to turn off.",
+    "llmAccessOffTitle": "Off — hidden from LLMs via MCP (pipeline processing is unaffected). Click to turn on.",
+    "reprocess": "Reprocess",
+    "editMetadata": "Edit Metadata",
+    "delete": "Delete Resource",
+    "cannotDeleteProcessing": "Cannot delete while Processing",
+    "save": "Save",
+    "cancel": "Cancel",
+    "form": {
+      "title": "Add Resource",
+      "name": "Name",
+      "type": "Type",
+      "sourceUrl": "URL",
+      "sourceFile": "File upload",
+      "urlPlaceholder": "https://...",
+      "register": "Register Resource",
+      "registering": "Registering..."
+    }
+  },
+  "pipelines": {
+    "title": "Processing Pipelines",
+    "subtitle": "Define how specific resource types are routed through plugins.",
+    "create": "Create Pipeline",
+    "triggersOn": "Triggers on:",
+    "attemptsTimeout": "{{attempts}}× attempts · {{timeout}}s timeout",
+    "editTitle": "Edit Pipeline",
+    "createTitle": "Create Pipeline",
+    "name": "Name",
+    "triggerType": "Trigger Type",
+    "steps": "Steps",
+    "addStep": "Add step",
+    "columnsCaption": "Columns: plugin · max attempts · backoff (s) · timeout (s)",
+    "maxAttemptsTitle": "Max attempts",
+    "backoffSecondsTitle": "Backoff seconds",
+    "timeoutSecondsTitle": "Timeout seconds",
+    "save": "Save Pipeline"
+  },
+  "plugins": {
+    "title": "Plugin Registry",
+    "subtitle": "Manage worker nodes that process resources into LLM artifacts.",
+    "browseCommunity": "Browse Community",
+    "listening": "● Listening for events",
+    "offline": "○ Offline",
+    "versionByAuthor": "v{{version}} • By {{author}}"
+  },
+  "community": {
+    "panelTitle": "Community Plugins",
+    "panelSubtitle": "A public directory of plugins shared by other DataCore operators — browse, then vet and deploy any you want to use yourself.",
+    "openFullSite": "Open the full community site ↗",
+    "searchPlaceholder": "Search community plugins...",
+    "postPlugin": "Post a Plugin",
+    "empty": "No community plugins yet — be the first to post one.",
+    "repo": "Repo",
+    "versionByAuthor": "v{{version}} · by {{author}}",
+    "form": {
+      "namePlaceholder": "Plugin name",
+      "descriptionPlaceholder": "What does this plugin do?",
+      "repoUrlPlaceholder": "https://github.com/you/your-plugin",
+      "versionPlaceholder": "Version, e.g. 1.0.0",
+      "dockerImagePlaceholder": "Docker image (optional), e.g. ghcr.io/you/your-plugin:1.0.0",
+      "tagsPlaceholder": "Tags, comma-separated (optional), e.g. csv, embeddings",
+      "post": "Post Plugin",
+      "posting": "Posting...",
+      "cancel": "Cancel"
+    }
+  },
+  "communityLogin": {
+    "loginTitle": "Log in to the Community",
+    "registerTitle": "Create a Community account",
+    "subtitle": "Your DataCore Community account is the same one used at the standalone community site — needed to share a bundle. No account is required to import one.",
+    "emailPlaceholder": "Email",
+    "usernamePlaceholder": "Username",
+    "passwordPlaceholder": "Password (min 8 characters)",
+    "pleaseWait": "Please wait...",
+    "login": "Log in",
+    "createAccount": "Create account",
+    "needAccount": "Need an account?",
+    "alreadyHaveAccount": "Already have an account? Log in"
+  },
+  "shareBundle": {
+    "title": "Share as a DataCore Bundle",
+    "success": "Bundle shared to the Community Registry.",
+    "noPipelines": "You don't have any pipelines yet — create one before sharing a bundle.",
+    "explanation": "Sharing exports your entire local pipeline list and their resource definitions (name/type/source) — not the processed artifact content. Anyone who imports it re-fetches sources and reprocesses through their own pipelines.",
+    "pipelinesToShare": "Pipelines to share ({{count}})",
+    "repoUrlPlaceholder": "https://github.com/you/that-plugin",
+    "eligibleResources": "Completed, URL-sourced resources ({{count}} available)",
+    "noEligibleResources": "No eligible resources yet — a resource must be Completed, registered by URL (not uploaded), and of a type one of your pipelines above covers.",
+    "namePlaceholder": "Bundle name",
+    "descriptionPlaceholder": "What is this bundle for?",
+    "tagsPlaceholder": "Tags, comma-separated (optional)",
+    "submit": "Share Bundle",
+    "submitting": "Sharing...",
+    "loginAndShare": "Log in and Share"
+  },
+  "importBundle": {
+    "title": "Import from Community",
+    "searchPlaceholder": "Search shared bundles...",
+    "noBundlesFound": "No bundles found.",
+    "importedSummary_one": "Imported {{count}} resource{{failedSuffix}}.",
+    "importedSummary_other": "Imported {{count}} resources{{failedSuffix}}.",
+    "failedSuffix": ", {{count}} failed",
+    "checkResourcesView": "Check the Resources view — they'll process automatically if a matching pipeline exists.",
+    "backToSearch": "← Back to search",
+    "alreadyHavePipeline": "You already have a local pipeline for: {{types}} — matching resources will start processing right away.",
+    "missingPipeline": "You don't have a pipeline for {{type}} yet (\"{{name}}\"). Resources of this type will still be registered and will sit Pending until you create one with these plugins:",
+    "repoLink": "repo",
+    "resourcesToImport": "Resources to import ({{count}})",
+    "import": "Import {{count}} resource(s)",
+    "importing": "Importing..."
+  },
+  "artifactViewer": {
+    "loading": "Loading...",
+    "dimensionalVector": "{{count}}-dimensional embedding vector",
+    "repoTable": {
+      "repo": "Repo",
+      "language": "Language",
+      "stars": "Stars",
+      "forks": "Forks"
+    },
+    "fork": "fork",
+    "scannedSummary": "{{count}} public repos for {{username}} — scanned {{date}}"
+  }
+}

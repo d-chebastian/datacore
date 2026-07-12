@@ -1,0 +1,16 @@
+node_modules/
+dist/
+build/
+*.log*
+.env*
+coverage/
+.git/
+.gitignore
+Dockerfile*
+.dockerignore
+.vscode/
+.idea/
+specs/
+ref/
+.specify/
+.claude/

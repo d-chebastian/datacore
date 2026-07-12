@@ -1,0 +1,56 @@
+# Production override for the core app — apply with:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Requires a `.env` file in this directory with POSTGRES_PASSWORD and MINIO_ROOT_PASSWORD set (the AWS
+# CDK stack in infra/ generates these and writes .env automatically on first boot — see infra/README.md).
+#
+# What this changes vs. the dev compose file:
+# - Removes the public host port mappings for internal-only services (postgres, minio, qdrant) — only
+#   containers on the shared datacore-net network can reach them. The Security Group only allows
+#   80/443 in anyway, but this removes the exposure even from other processes on the same host.
+# - Replaces the hardcoded dev credentials with values from `.env`.
+# - Binds core-api/frontend's ports to 127.0.0.1 only — Caddy (running on the host, not in Docker)
+#   terminates TLS for the public domain and reverse-proxies to these loopback-only ports.
+#
+# NOTE: Compose merges (concatenates) list-valued keys like `ports` across files by default — an empty
+# `ports: []` in an override does NOT clear the base file's list, it's a no-op union. The `!reset` tag
+# (Compose Specification, supported by Compose v2.24+) is required to actually replace rather than merge.
+services:
+  postgres:
+    ports: !reset []
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+  rabbitmq:
+    ports: !reset
+      - '127.0.0.1:15672:15672' # management UI — reach it via `aws ssm start-session ... --document-name AWS-StartPortForwardingSession`
+
+  minio:
+    ports: !reset []
+    environment:
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+
+  qdrant:
+    ports: !reset []
+
+  core-api:
+    ports: !reset
+      - '127.0.0.1:3010:3000'
+    environment:
+      DATABASE_URL: postgresql://datacore:${POSTGRES_PASSWORD}@postgres:5432/datacore
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+
+  plugin-markdown-summarizer:
+    environment:
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+
+  plugin-vector-embedder: {}
+
+  plugin-github-profile-scanner:
+    environment:
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
+
+  frontend:
+    ports: !reset
+      - '127.0.0.1:5173:5173'

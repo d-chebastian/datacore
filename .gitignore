@@ -1,0 +1,41 @@
+node_modules/
+dist/
+build/
+*.log
+.env
+.env.*
+!.env.example
+coverage/
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.vscode/
+.idea/
+
+# Prisma
+backend/prisma/*.db
+
+# Docker volumes mounted locally (if any)
+.minio-data/
+.postgres-data/
+
+# Registry SQLite data
+registry/data/*.db*
+
+# Not part of the public/open-source repo — kept locally only. registry/community-site/docs are a
+# separate, non-public component (deployed to datacore.io/community.datacore.io, not published here).
+# specs/examples/ref and the spec-kit tooling directories are this project's own working notes, not
+# main-app source code, so they stay out of the public GitHub repo too.
+/registry/
+/community-site/
+/docs/
+/docker-compose.registry.yml
+/docker-compose.registry.prod.yml
+/infra/
+/specs/
+/examples/
+/ref/
+/.claude/
+/.specify/
+/CLAUDE.md
