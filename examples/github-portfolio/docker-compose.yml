@@ -1,0 +1,54 @@
+# Runs this example in a container instead of needing Node/npm installed locally.
+#
+# `portfolio` is a one-shot script, not a long-running service — run it with `run`, not `up -d`:
+#   docker compose run --rm portfolio
+#   docker compose run --rm -e GITHUB_USERNAME=someone-else portfolio
+#
+# `viewer` serves the generated output/ at an actual http:// URL, including the "ask about my work" search
+# box's /api/ask endpoint (see src/server.ts) — it's long-running, start it once with `up -d`:
+#   docker compose up -d viewer
+#   open http://localhost:8090/portfolio.html
+# It reads whatever's currently in ./output on each request, so re-running `portfolio` and refreshing the
+# browser picks up a new version (and a rebuilt search index) — no restart needed. The search box only
+# works if `GEMINI_API_KEY` is set here too (it needs it server-side for embedding each question).
+#
+# Requires the main DataCore stack to already be running (repo root docker-compose.yml) — `portfolio` joins
+# its `datacore-net` network to reach the Core API by service name, the same way the plugin workers do.
+# Reads a local `.env` file for GITHUB_USERNAME / GEMINI_API_KEY / GEMINI_MODEL / GEMINI_EMBEDDING_MODEL if
+# present (see `.env.example`) — none of them are required, all have defaults or degrade gracefully when
+# unset (no AI copy, no search box — just the raw scanned data).
+services:
+  portfolio:
+    build: .
+    networks: [datacore-net]
+    environment:
+      CORE_API_URL: http://core-api:3000/api/v1
+      GITHUB_USERNAME: ${GITHUB_USERNAME:-d-chebastian}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-flash-latest}
+      GEMINI_EMBEDDING_MODEL: ${GEMINI_EMBEDDING_MODEL:-gemini-embedding-001}
+      OUTPUT_PATH: /app/output/portfolio.html
+    volumes:
+      - ./output:/app/output
+
+  viewer:
+    build: .
+    command: ['node', 'dist/server.js']
+    restart: unless-stopped
+    ports:
+      - '8090:3000'
+    environment:
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-flash-latest}
+      GEMINI_EMBEDDING_MODEL: ${GEMINI_EMBEDDING_MODEL:-gemini-embedding-001}
+      OUTPUT_DIR: /app/output
+      # /api/ask holds GEMINI_API_KEY server-side — these bound worst-case cost/abuse if you put this on
+      # the public internet. See "Cost & abuse protection" in README.md for what to also do on Google's side.
+      SEARCH_RATE_LIMIT_PER_HOUR: ${SEARCH_RATE_LIMIT_PER_HOUR:-10}
+      SEARCH_DAILY_CAP: ${SEARCH_DAILY_CAP:-100}
+    volumes:
+      - ./output:/app/output
+
+networks:
+  datacore-net:
+    external: true

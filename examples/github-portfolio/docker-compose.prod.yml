@@ -1,0 +1,31 @@
+# Production deployment of just the `viewer` server — not the one-shot `portfolio` generator, since the
+# production host doesn't run the main DataCore backend (core-api) that generation needs. The workflow is:
+# generate output/ locally against your own DataCore instance (npm start), then ship the compiled
+# dist/server.js + output/ here for serving. server.ts has zero runtime dependencies (Node built-ins +
+# fetch only), so this runs directly off the stock `node:20-alpine` image — no Dockerfile/build step needed
+# on the target host at all.
+#
+#   docker compose -f docker-compose.prod.yml up -d
+#
+# Bound to 127.0.0.1 only — a reverse proxy (Caddy, on the host, not in Docker — see infra/lib/user-data.ts)
+# is what's actually reachable from the internet and terminates TLS.
+services:
+  viewer:
+    image: node:20-alpine
+    command: ['node', 'dist/server.js']
+    working_dir: /app
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:8090:3000'
+    environment:
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-flash-latest}
+      OUTPUT_DIR: /app/output
+      SEARCH_RATE_LIMIT_PER_HOUR: ${SEARCH_RATE_LIMIT_PER_HOUR:-10}
+      SEARCH_DAILY_CAP: ${SEARCH_DAILY_CAP:-100}
+      # Caddy is a reverse proxy we control in front of this, so its X-Forwarded-For can be trusted for
+      # per-IP rate limiting — see server.ts.
+      TRUST_PROXY: 'true'
+    volumes:
+      - ./dist:/app/dist:ro
+      - ./output:/app/output:ro

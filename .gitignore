@@ -25,8 +25,9 @@ registry/data/*.db*
 
 # Not part of the public/open-source repo — kept locally only. registry/community-site/docs are a
 # separate, non-public component (deployed to datacore.io/community.datacore.io, not published here).
-# specs/examples/ref and the spec-kit tooling directories are this project's own working notes, not
-# main-app source code, so they stay out of the public GitHub repo too.
+# specs/ref and the spec-kit tooling directories are this project's own working notes, not main-app
+# source code, so they stay out of the public GitHub repo too. examples/ IS published (see its own
+# per-directory .gitignore for build output/.env exclusions).
 /registry/
 /community-site/
 /docs/
@@ -34,7 +35,6 @@ registry/data/*.db*
 /docker-compose.registry.prod.yml
 /infra/
 /specs/
-/examples/
 /ref/
 /.claude/
 /.specify/
